@@ -1,0 +1,49 @@
+{
+    "name": "node_task_3_1",
+    "version": "1.0.0",
+    "description": "To make it easy for you to get started with GitLab, here's a list of recommended next steps.",
+    "main": "index.js",
+    "scripts": {
+        "format": "prettier --write . && eslint --fix --color .",
+        "lint": "prettier --check . && eslint .",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "tsc",
+        "start": "node ./dist/index.js",
+        "dev": "nodemon ./src/index.ts",
+        "prepare": "husky install"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^1.6.2",
+        "cron": "^3.1.6",
+        "dotenv": "^16.3.1",
+        "mongoose": "^8.0.3",
+        "pino": "^8.16.2",
+        "pino-pretty": "^10.2.3",
+        "pino-tee": "^0.3.0",
+        "telegraf": "^4.15.2",
+        "uuid": "^9.0.1"
+    },
+    "devDependencies": {
+        "@types/country-list": "^2.1.4",
+        "@types/uuid": "^9.0.7",
+        "@typescript-eslint/eslint-plugin": "^6.13.1",
+        "@typescript-eslint/parser": "^6.13.1",
+        "eslint": "^8.54.0",
+        "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-prettier": "^5.0.1",
+        "husky": "^8.0.0",
+        "lint-staged": "^15.1.0",
+        "nodemon": "^3.0.1",
+        "ts-node": "^10.9.1",
+        "tsconfig-paths": "^4.2.0",
+        "typescript": "^5.3.2"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npx lint-staged"
+        }
+    }
+}

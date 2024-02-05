@@ -1,0 +1,7 @@
+node_modules
+free_company_dataset.csv
+package-lock.json
+.vscode
+.env
+dist
+logs
