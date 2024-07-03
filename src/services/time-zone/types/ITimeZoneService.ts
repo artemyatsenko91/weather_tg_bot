@@ -3,7 +3,7 @@ export interface ITimeZoneService {
 }
 
 export interface ITimeZoneResponseTypes {
-    gmt_offset: string;
-    latitude: number;
-    longitude: number;
+    currentUtcOffset: {
+        seconds: number;
+    };
 }

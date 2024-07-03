@@ -6,6 +6,7 @@ import {
     UserSettings,
     UserSettingsSchema,
 } from "../user-settings/models/user-settings.model";
+import { UserSettingsModule } from "../user-settings/user-settings.module";
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import {
             { name: Subscription.name, schema: SubscriptionSchema },
             { name: UserSettings.name, schema: UserSettingsSchema },
         ]),
+        UserSettingsModule,
     ],
     providers: [SubscriptionService],
     exports: [SubscriptionService],

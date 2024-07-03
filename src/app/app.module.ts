@@ -23,7 +23,7 @@ const mongoModule = MongooseModule.forRootAsync({
         const MONGO_DB_NAME = configService.get("MONGO_DB_NAME");
 
         return {
-            uri: `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_CLUSTER_NAME}.1i22sgg.mongodb.net/${MONGO_DB_NAME}?retryWrites=true&w=majority`,
+            uri: `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_CLUSTER_NAME}.1i22sgg.mongodb.net/?retryWrites=true&w=majority&appName=${MONGO_DB_NAME}`,
         };
     },
 });

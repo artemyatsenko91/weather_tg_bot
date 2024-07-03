@@ -50,7 +50,7 @@ export class SubscriptionCommandService {
         context.reply(messagesData.subscription.start_message);
         context.session = {
             ...context.session,
-            state: State.SUB_TIMEZONE_INPUT,
+            state: State.SUB_LOCATION_INPUT,
         };
 
         setTimeout(() => {

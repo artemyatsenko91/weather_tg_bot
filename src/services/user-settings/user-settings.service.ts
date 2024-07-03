@@ -26,20 +26,30 @@ export class UserSettingsService {
     ) {}
 
     public async setCoords(context: BotContext, userText: ICoordsTypes) {
-        const timeZoneResponse = await this.timeZoneService.getUTCOffset(
-            `${userText.latitude},${userText.longitude}`,
-        );
-        const location = await this.getLocationName(timeZoneResponse);
+        const timeZoneResponse = await this.timeZoneService.getUTCOffset({
+            latitude: userText.latitude,
+            longitude: userText.longitude,
+        });
+
+        const location = await this.getLocationName({
+            latitude: userText.latitude,
+            longitude: userText.longitude,
+        });
         context.session = {
             ...context.session,
             userSettings: {
                 ...context.session?.userSettings,
                 coords: {
-                    latitude: timeZoneResponse.latitude,
-                    longitude: timeZoneResponse.longitude,
+                    latitude: userText.latitude,
+                    longitude: userText.longitude,
                 },
                 utc_offset: {
-                    hours: +timeZoneResponse.gmt_offset,
+                    hours: this.timeZoneService.convertSecondsToHours(
+                        timeZoneResponse.currentUtcOffset.seconds,
+                    ).hours,
+                    minutes: this.timeZoneService.convertSecondsToHours(
+                        +timeZoneResponse.currentUtcOffset.seconds,
+                    ).minutes,
                 },
                 location,
             },
@@ -47,7 +57,7 @@ export class UserSettingsService {
     }
 
     public async getLocationName(
-        timeZoneResponse: ITimeZoneResponseTypes,
+        timeZoneResponse: ICoordsTypes,
     ): Promise<string> {
         const coordsObj: ICoordsTypes = {
             latitude: timeZoneResponse.latitude,
@@ -93,16 +103,27 @@ export class UserSettingsService {
                 },
             };
         } else {
-            const timeZoneResponse = await this.timeZoneService.getUTCOffset(
-                userText as string,
-            );
+            let timeZoneResponse: ITimeZoneResponseTypes;
+            if (
+                typeof userText === "object" &&
+                "latitude" in userText &&
+                "longitude" in userText
+            ) {
+                timeZoneResponse =
+                    await this.timeZoneService.getUTCOffset(userText);
+            }
             context.session = {
                 ...context.session,
                 state: State.NEUTRAL,
                 userSettings: {
                     ...context.session?.userSettings,
                     utc_offset: {
-                        hours: +timeZoneResponse.gmt_offset,
+                        hours: this.timeZoneService.convertSecondsToHours(
+                            timeZoneResponse.currentUtcOffset.seconds,
+                        ).hours,
+                        minutes: this.timeZoneService.convertSecondsToHours(
+                            timeZoneResponse.currentUtcOffset.seconds,
+                        ).minutes,
                     },
                 },
             };
@@ -117,13 +138,16 @@ export class UserSettingsService {
     }
 
     public async insertTimeZoneByCoords(chatId: number, coords: ICoordsTypes) {
-        const timeZoneResponse = await this.timeZoneService.getUTCOffset(
-            `${coords.latitude},${coords.longitude}`,
-        );
+        const timeZoneResponse = await this.timeZoneService.getUTCOffset({
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+        });
         await this.userModel.create({
             chatId,
             utc_offset: {
-                hours: timeZoneResponse.gmt_offset,
+                hours: this.timeZoneService.convertSecondsToHours(
+                    timeZoneResponse.currentUtcOffset.seconds,
+                ),
             },
         });
     }
@@ -136,12 +160,15 @@ export class UserSettingsService {
             await this.userModel.findOne({
                 chatId,
             });
-        const timeZoneResponse = await this.timeZoneService.getUTCOffset(
-            `${coords.latitude},${coords.longitude}`,
-        );
+        const timeZoneResponse = await this.timeZoneService.getUTCOffset({
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+        });
         if (userTimeZone) {
             const userHours = userTimeZone.utc_offset?.hours;
-            const utcOffsetHours = +timeZoneResponse.gmt_offset;
+            const utcOffsetHours = this.timeZoneService.convertSecondsToHours(
+                timeZoneResponse.currentUtcOffset.seconds,
+            ).hours;
 
             if (userHours !== undefined && utcOffsetHours !== undefined) {
                 await this.userModel.updateOne(

@@ -13,6 +13,7 @@ import {
 } from "../user-settings/models/user-settings.model";
 import { convertTimeToUTC } from "src/common/convertLocalTimeToUTC";
 import { ITZType } from "src/common/parseInputs";
+import { UserSettingsService } from "../user-settings/user-settings.service";
 
 @Injectable()
 export class SubscriptionService {
@@ -21,24 +22,34 @@ export class SubscriptionService {
         private readonly subscription: Model<SubscriptionDocument>,
         @InjectModel(UserSettings.name)
         private readonly userSettings: Model<UserSettingsDocument>,
+        private readonly userSettingsService: UserSettingsService,
     ) {}
 
     public async insertOne(
-        userSettings: IUserSettings,
+        userSettingsData: IUserSettings,
         chatId: number,
         uuid: string,
     ) {
-        const userOffset: IUserSettingsResponse | null =
-            await this.userSettings.findOne({
-                chatId,
-            });
+        // const userOffsetResponse: IUserSettingsResponse | null =
+        await this.userSettingsService.insertTimeZone(
+            chatId,
+            userSettingsData.utc_offset,
+        );
+
+        // const userOffset = userOffsetResponse
+        //     ? userOffsetResponse.utc_offset
+        //     : userSettingsData.utc_offset;
+
         const subscriptions: IUserSettings = {
             coords: {
-                latitude: userSettings.coords?.latitude,
-                longitude: userSettings.coords?.longitude,
+                latitude: userSettingsData.coords?.latitude,
+                longitude: userSettingsData.coords?.longitude,
             },
-            location: userSettings.location,
-            time: convertTimeToUTC(userSettings.time, userOffset?.utc_offset),
+            location: userSettingsData.location,
+            time: convertTimeToUTC(
+                userSettingsData.time,
+                userSettingsData.utc_offset,
+            ),
             sub_id: uuid,
         };
 
@@ -67,13 +78,16 @@ export class SubscriptionService {
         }
     }
 
-    public async updateLocation(sub_id: string, userSettings: IUserSettings) {
+    public async updateLocation(
+        sub_id: string,
+        userSettingsData: IUserSettings,
+    ) {
         await this.subscription.updateOne(
             { sub_id },
             {
                 $set: {
-                    coords: userSettings.coords,
-                    location: userSettings.location,
+                    coords: userSettingsData.coords,
+                    location: userSettingsData.location,
                 },
             },
         );
@@ -81,7 +95,7 @@ export class SubscriptionService {
 
     public async updateTime(
         sub_id: string,
-        userSettings: IUserSettings,
+        userSettingsData: IUserSettings,
         chatId: number,
     ) {
         const subData: IUserSettingsResponse | null =
@@ -93,7 +107,7 @@ export class SubscriptionService {
             {
                 $set: {
                     time: convertTimeToUTC(
-                        userSettings.time,
+                        userSettingsData.time,
                         subData?.utc_offset,
                     ),
                 },

@@ -29,7 +29,7 @@ export class TelegramService {
         private readonly userSettingsService: UserSettingsService,
         private readonly subscriptionService: SubscriptionService,
         private readonly weatherService: WeatherService,
-    ) {} // ,
+    ) {}
     public async switchNextState(context: BotContext) {
         const state = context.session?.state;
         let session = context.session;
@@ -88,6 +88,7 @@ export class TelegramService {
                 }
             }
         }
+
         switch (state) {
             case State.LOCATION_INPUT:
                 {
