@@ -46,15 +46,16 @@ export class TelegramService {
                     context.reply(
                         messagesData.subscription.invalid_coord_input,
                     );
-                    break;
+                    return;
                 case InputType.time:
                     context.reply(messagesData.subscription.time_input_error);
-                    break;
+                    return;
                 case InputType.zone:
                     context.reply(messagesData.subscription.time_zone_invalid);
-                    break;
+                    return;
                 default:
-                    break;
+                    context.reply(messagesData.location.no_matches);
+                    return;
             }
         }
 
@@ -63,10 +64,11 @@ export class TelegramService {
                 await this.weatherService.getWeatherByCityName(
                     inputData.data as string,
                 );
+
             switch (locationResponse.length) {
                 case 0:
                     context.reply(messagesData.location.no_matches);
-                    break;
+                    return;
                 case 1:
                     {
                         const coords = {
@@ -88,15 +90,17 @@ export class TelegramService {
                 }
             }
         }
-
         switch (state) {
             case State.LOCATION_INPUT:
                 {
                     const coords = inputData.data as InputCoords;
-                    this.weatherCommandService.showWeatherByCoords(context, {
-                        latitude: coords.latitude,
-                        longitude: coords.longitude,
-                    } as ICoordsTypes);
+                    await this.weatherCommandService.showWeatherByCoords(
+                        context,
+                        {
+                            latitude: coords.latitude,
+                            longitude: coords.longitude,
+                        } as ICoordsTypes,
+                    );
                     session = {
                         ...session,
                         state: State.NEUTRAL,

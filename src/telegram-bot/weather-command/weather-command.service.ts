@@ -31,7 +31,8 @@ export class WeatherCommandService {
                 await this.weatherService.getWeatherByCoord(coords);
             this.printWeatherInfos(context, weatherData);
         } catch (error) {
-            context.reply((error as Error).message);
+            const weatherError = error as WeatherError;
+            context.reply(weatherError.error.message);
         }
     }
 

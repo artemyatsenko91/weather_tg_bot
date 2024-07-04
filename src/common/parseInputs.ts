@@ -25,7 +25,6 @@ export const parseText = async (
     types: InputType,
 ): Promise<InputData | undefined> => {
     let unparsedData: InputData;
-
     if (types & InputType.coords) {
         const coordinatePattern = /^(-?\d+(\.\d+)?)\s+(-?\d+(\.\d+)?)$/;
         const parsedCoords = coordinatePattern.exec(text);
@@ -68,7 +67,7 @@ export const parseText = async (
         if (parsedZone) {
             const timeArr = text.split(":");
             return {
-                type: InputType.time,
+                type: InputType.zone,
                 data: {
                     hours: +timeArr[0],
                     minutes: timeArr[1] ? +timeArr[1] : 0,
@@ -91,9 +90,10 @@ export const parseText = async (
             };
         } else {
             unparsedData = {
-                type: InputType.time,
+                type: InputType.city,
                 data: null,
             };
+
             return unparsedData;
         }
     }

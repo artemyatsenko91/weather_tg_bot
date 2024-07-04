@@ -10,12 +10,11 @@ export class ManualInputCommandController {
     @Hears(/.*/)
     public async manualCommands(context: BotContext) {
         const state = context.session?.state;
-
         if (context.message && "text" in context.message) {
             await this.manualInputCommandService.updateStateByInput(
                 context,
                 state,
-                context.message.text,
+                context.message.text.trim(),
             );
         }
     }
